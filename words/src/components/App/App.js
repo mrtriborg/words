@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 
 import {data as localData} from '../../data';
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
+
 function App() {
   const [gameMode, setGameMode] = useState(false);
   const [words, setWords] = useState(localData);
@@ -26,7 +28,7 @@ function App() {
 
   useEffect(() => {
     // try loading from backend; fall back to local data
-    fetch('/api/words')
+    fetch(`${API_BASE}/api/words`)
       .then(r => r.json())
       .then(d => {
         setWords(d);

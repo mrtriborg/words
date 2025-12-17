@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './Item.css';
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
+
 const Item = ({
   item, 
   gameMode, 
@@ -89,7 +91,7 @@ const Item = ({
           onClick={async (e) => {
             e.stopPropagation();
             try {
-              const res = await fetch(`/api/words/${item.id}`, {
+              const res = await fetch(`${API_BASE}/api/words/${item.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ learned: true })
@@ -112,7 +114,7 @@ const Item = ({
           onClick={async (e) => {
             e.stopPropagation();
             try {
-              const res = await fetch(`/api/words/${item.id}`, {
+              const res = await fetch(`${API_BASE}/api/words/${item.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ learned: false })

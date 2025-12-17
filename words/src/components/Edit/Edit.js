@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './Edit.css';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
+
 const emptyWord = () => ({ title: '', transcription: '', translate: '', examples: [] });
 
 const Edit = () => {
@@ -14,7 +16,7 @@ const Edit = () => {
   const [saved, setSaved] = useState(false);
 
   const load = () => {
-    fetch('/api/words')
+    fetch(`${API_BASE}/api/words`)
       .then(r => r.json())
       .then(d => setWords(d.sort((a, b) => b.id - a.id)))
       .catch(err => console.error(err));
@@ -64,7 +66,7 @@ const Edit = () => {
     const payload = { ...editing, examples: editing.examples.map(e => (e.text || '')) };
     try {
       if (isCreating) {
-        const res = await fetch('/api/words', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const res = await fetch(`${API_BASE}/api/words`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         const created = await res.json();
         // refresh list from server to keep consistent
         await load();
@@ -74,7 +76,7 @@ const Edit = () => {
         setIsCreating(false);
         navigate('/edit');
       } else {
-        const res = await fetch(`/api/words/${editing.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const res = await fetch(`${API_BASE}/api/words/${editing.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         const updated = await res.json();
         await load();
         setSaved(true);
@@ -91,7 +93,7 @@ const Edit = () => {
   const remove = async (id) => {
     if (!window.confirm('Delete this word?')) return;
     try {
-      const res = await fetch(`/api/words/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/api/words/${id}`, { method: 'DELETE' });
       const result = await res.json();
       if (result.success) setWords(prev => prev.filter(w => w.id !== id));
     } catch (err) { console.error(err); }
