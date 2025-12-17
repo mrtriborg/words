@@ -1,0 +1,86 @@
+.app-header {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+a {
+  font-weight: 600;
+  padding: 5px 10px;
+  color: #f4f4f4;
+  text-transform: uppercase;
+}
+
+.btn {
+  margin: 5px;
+  border-radius: 100px;
+  color: black;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.small-btn {
+  margin: 5px;
+  border-radius: 100px;
+  color: black;
+  font-weight: 600;
+  border: 1px solid black;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.btn:link,
+.btn:visited {
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 15px 40px;
+  display: inline-block;
+  border-radius: 100px;
+  transition: all .2s;
+  position: absolute;
+}
+
+.btn:active {
+  transform: translateY(-1px);
+}
+
+.header-btns-wrapper {
+  padding: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.disabled-link {
+  pointer-events: none;
+  margin: 5px;
+  border-radius: 100px;
+  color: black;
+  border: 1px solid darkgray;
+  background-color: darkgray;
+  color: white;
+  cursor: pointer;
+}
+
+.disabled-link-small-btn {
+  pointer-events: none;
+  margin: 5px;
+  border-radius: 100px;
+  color: black;
+  font-weight: 600;
+  border: 1px solid darkgray;
+  background-color: darkgray;
+  color: white;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.all-words-for-repeat {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

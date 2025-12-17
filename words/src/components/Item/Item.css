@@ -1,0 +1,38 @@
+.item {
+  padding: 5px;
+  border-color: rgb(9, 114, 0);
+  border: 1px solid;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.item-container {
+  position: relative;
+  margin: 10px 0;
+}
+
+.translate-modal {
+  z-index: 1;
+  position: absolute;
+  background-color: white;
+  left: 40%;
+  top: 90%;
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.example-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.example {
+  display: flex;
+  flex-direction: column;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}

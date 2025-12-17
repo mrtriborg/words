@@ -1,0 +1,32 @@
+.edit-page {
+  padding: 20px;
+}
+.edit-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.word-list {
+  margin-top: 16px;
+}
+.word-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+.editor {
+  margin-top: 16px;
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+.examples-list {
+  margin-top: 8px;
+}
+.example-row {
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.example-row input { flex:1 }
+.controls { display:flex; gap:8px; margin-top:8px }

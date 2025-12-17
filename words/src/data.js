@@ -1,0 +1,538 @@
+export const data = [
+  {
+    id: 4,
+    title: "Rather",
+    transcription: "[ˈrɑːðə]", 
+    translate: "скорее, наоборот, давольно, предпрчтительнее",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 5,
+    title: "Establish",
+    transcription: "[ɪsˈtæblɪʃ]", 
+    translate: "установить, создать, учредить, основать",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 6,
+    title: "Caution",
+    transcription: "[kɔːʃn]", 
+    translate: "осторожность, предостерегать, осторожно",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 7,
+    title: "Trunk",
+    transcription: "[trʌŋk]", 
+    translate: "багажник, ствол, хобот, сундук",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 8,
+    title: "Libel",
+    transcription: "[ˈlaɪbəl]", 
+    translate: "клевета",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 9,
+    title: "linger",
+    transcription: "[ˈlɪngə]", 
+    translate: "задерживаться, медлить",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 10,
+    title: "Endurance",
+    transcription: "[ɪnˈdjʊərəns]", 
+    translate: "выносливость, выносливый",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 11,
+    title: "Resistance",
+    transcription: "[rɪˈzɪstəns]", 
+    translate: "сопротивление, стойкость, устойчивость",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 12,
+    title: "Snide",
+    transcription: "[snaɪd]", 
+    translate: "ехидный, язвительный, подлый",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 13,
+    title: "Duster",
+    transcription: "[ˈdʌstə]", 
+    translate: "тряпка, ветровка, плащ",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 14,
+    title: "Proceed",
+    transcription: "[prəˈsiːd]", 
+    translate: "продолжить, приступать",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 15,
+    title: "Dedication",
+    transcription: "[dedɪˈkeɪʃn]", 
+    translate: "преданность",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 16,
+    title: "Riot",
+    transcription: "[ˈraɪət]", 
+    translate: "бунт, бунтовать",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 17,
+    title: "Thief",
+    transcription: "[θiːf]", 
+    translate: "вор",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 18,
+    title: "Roast",
+    transcription: "[rəʊst]", 
+    translate: "жарить, жаркое",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 20,
+    title: "Bake",
+    transcription: "[beɪk]", 
+    translate: "испечь",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 21,
+    title: "Occupy",
+    transcription: "[ˈɒkjʊpaɪ]", 
+    translate: "занимать, оккупировать, завладеть",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 22,
+    title: "Redeem",
+    transcription: "[rɪˈdiːm]", 
+    translate: "выкупать, искупать (вину)",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 23,
+    title: "Pipe",
+    transcription: "[paɪp]", 
+    translate: "труба, трубопровод, трубопроводный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 24,
+    title: "Burst",
+    transcription: "[bɜːst]", 
+    translate: "взрыв, взрываться, лопаться, взрывной",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 25,
+    title: "Execute",
+    transcription: "[ˈeksɪkjuːt]", 
+    translate: "выполнять, выполнение",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 26,
+    title: "Cynical",
+    transcription: "[ˈsɪnɪkəl]", 
+    translate: "циничный",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 27,
+    title: "Invincible",
+    transcription: "[ɪnˈvɪnsəbl]", 
+    translate: "непобедимый, неуязвимый",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 28,
+    title: "Slip",
+    transcription: "[slɪp]", 
+    translate: "скользить, скольжение",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 29,
+    title: "Grape",
+    transcription: "[greɪp]", 
+    translate: "виноград, виноградный",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 30,
+    title: "Edible",
+    transcription: "[ˈedəb(ə)l]", 
+    translate: "съедобный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 31,
+    title: "Encounter",
+    transcription: "[ɪnˈkaʊntə]", 
+    translate: "столкновение, стычка, схватка, сталкиваться",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 32,
+    title: "Float",
+    transcription: "[fləʊt]", 
+    translate: "плыть, поплавок, плавучий",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 33,
+    title: "Patronize",
+    transcription: "[ˈpætrənaɪz]", 
+    translate: "покровительствовать, опекать, покровительственный",
+    learned: true,    
+    examples: []
+  },
+  {
+    id: 34,
+    title: "Massacre",
+    transcription: "[ˈmæsəkə]", 
+    translate: "резня, бойня, истреблять",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 35,
+    title: "Hint",
+    transcription: "[hɪnt]", 
+    translate: "подсказка, намек, намекать",
+    learned: false,
+    examples: []
+  },
+    {
+    id: 36,
+    title: "Involve",
+    transcription: "[ɪnˈvɒlv]", 
+    translate: "вовлекать, включать в себя, связано с",
+    learned: false,
+    examples: [
+      {
+        en: "Photo stories usually [involve] multiple photos which flow together.", 
+        ru: "Фото истории обычно [включают в себя] несколько фотографий, собранных вместе."
+      },
+      {
+        en: "Developing new technologies always [involve] risks.",
+        ru: "Развитие новых технологий всегда [связано с] какими-либо рисками."
+      }
+    ]
+  },
+  {
+    id: 37,
+    title: "Offense",
+    transcription: "[əˈfens]", 
+    translate: "преступление, правонарушение",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 38,
+    title: "Afford",
+    transcription: "[əˈfens]", 
+    translate: "позволить себе, обеспечить",
+    learned: false,
+    examples: [
+      {
+        en: "Rick can afford matching luggage.", 
+        ru: "Рик может себе позволить чемоданы одного цвета."
+      },
+    ]
+  },
+  {
+    id: 39,
+    title: "Appearance",
+    transcription: "[əˈpɪərəns]", 
+    translate: "внешний вид, внешность, появление",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 40,
+    title: "Behalf",
+    transcription: "[bɪˈhɑːf]", 
+    translate: "от имени",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 41,
+    title: "Demand",
+    transcription: "[dɪˈmɑːnd]", 
+    translate: "спрос, требование, потребность, требовать",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 42,
+    title: "Hesitate",
+    transcription: "[ˈhezɪteɪt]", 
+    translate: "колебаться, стесняться",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 43,
+    title: "Caption",
+    transcription: "[kæpʃn]", 
+    translate: "заголовок, подпись, титр",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 44,
+    title: "Instant",
+    transcription: "[ˈɪnstənt]", 
+    translate: "момент, мгновение, немедленный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 45,
+    title: "Instance",
+    transcription: "[ˈɪnstəns]", 
+    translate: "пример, эксземпляр",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 46,
+    title: "Germ",
+    transcription: "[ʤɜːm]", 
+    translate: "микроб, зародыш, зачаток",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 47,
+    title: "Assure",
+    transcription: "[əˈʃʊə]", 
+    translate: "уверять, убеждать, гарантировать, обеспечивать",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 48,
+    title: "Justify",
+    transcription: "[ˈʤʌstɪfaɪ]", 
+    translate: "оправдывать, оправдываться",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 49,
+    title: "Intention",
+    transcription: "[ɪnˈtenʃn]", 
+    translate: "намерение, цель, стремление, замысел",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 50,
+    title: "Toss",
+    transcription: "[tɒs]", 
+    translate: "бросать, бросок",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 51,
+    title: "Tremendous",
+    transcription: "[trɪˈmendəs]", 
+    translate: "огромный, колоссальный, потрясающий, потрясающе, ужасный, чудовищный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 52,
+    title: "Penetration",
+    transcription: "[penɪˈtreɪʃn]", 
+    translate: "проникновение, вторжение",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 53,
+    title: "Influence",
+    transcription: "[ˈɪnflʊəns]", 
+    translate: "влияние, воздействие, влиять, воздействовать",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 54,
+    title: "Reinforce",
+    transcription: "[riːɪnˈfɔːs]", 
+    translate: "усиливать, укреплять, арматурный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 55,
+    title: "Yield",
+    transcription: "[jiːld]", 
+    translate: "уступать, урожай",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 56,
+    title: "Revenue",
+    transcription: "[ˈrevɪnjuː]", 
+    translate: "доход, выручка, доходный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 57,
+    title: "Income",
+    transcription: "[ˈɪnkʌm]", 
+    translate: "доход, прибыль, подоходный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 58,
+    title: "Fascinate",
+    transcription: "[ˈfæsɪneɪt]", 
+    translate: "очаровывать, пленять",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 59,
+    title: "Measure",    
+    transcription: "[ˈmeʒə]", 
+    translate: "мера, замер, измерять",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 60,
+    title: "Degree",
+    transcription: "[dɪˈgriː]", 
+    translate: "степень, уровень, диплом, градус",
+    learned: true,
+    examples: []
+  },
+  {
+    id: 61,
+    title: "Sharp",
+    transcription: "[ʃɑːp]", 
+    translate: "острый, резкий",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 62,
+    title: "Arrogance",
+    transcription: "[ˈærəgəns]", 
+    translate: "высокомерие, надменность, заносчивость, самонадеянность",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 63,
+    title: "Impudent",
+    transcription: "[ˈɪmpjʊdənt]", 
+    translate: "дерзкий, наглый",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 64,
+    title: "Upon",
+    transcription: "[əˈpɒn]", 
+    translate: "на, после, по, при, в",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 65,
+    title: "Spectacular",
+    transcription: "[spekˈtækjʊlə]", 
+    translate: "зрелищный, захватывающий, эффектный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 67,
+    title: "Engage",
+    transcription: "[ɪnˈgeɪʤ]", 
+    translate: "привлекать, вовлекать, привлечение, вовлечение",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 68,
+    title: "Charge",
+    transcription: "[ʧɑːʤ]", 
+    translate: "заряжать, обвинять, поручать, зарядка, обвинение, обязанность",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 69,
+    title: "Due",
+    transcription: "[djuː]", 
+    translate: "надлежащий, должный",
+    learned: false,
+    examples: []
+  },
+  {
+    id: 70,
+    title: "Dedicate",
+    transcription: "[ˈdedɪkeɪt]", 
+    translate: "посвящать, предназначать",
+    learned: false,
+    examples: []
+  },
+]
+
+// devour, consume, 

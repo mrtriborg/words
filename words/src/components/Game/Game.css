@@ -1,0 +1,22 @@
+.game-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 0 10px;
+}
+
+.game-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+.game-buttons a {
+  margin: 0 10px 10px;
+  font-size: 15px;
+}
+
+.repeat {
+  margin-bottom: 20px;
+}
