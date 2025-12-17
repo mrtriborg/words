@@ -24,6 +24,16 @@ let words = [];
 async function loadData() {
   if (STORAGE_MODE === 'db') {
     try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS words (
+          id INTEGER PRIMARY KEY,
+          title TEXT,
+          transcription TEXT,
+          translate TEXT,
+          learned BOOLEAN,
+          examples JSON
+        )
+      `);
       const res = await pool.query('SELECT * FROM words ORDER BY id');
       words = res.rows.map(row => ({
         ...row,
