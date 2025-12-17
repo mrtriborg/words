@@ -542,5 +542,45 @@
     "title": "Consume",
     "transcription": "[kənˈsjuːm]",
     "translate": "потреблять, съедать, пожирать"
+  },
+  {
+    "id": 72,
+    "learned": false,
+    "examples": [
+      ""
+    ],
+    "title": "Anguish",
+    "transcription": "[ˈæŋgwɪʃ]",
+    "translate": "мучение, страдание, боль, мучить"
+  },
+  {
+    "id": 73,
+    "learned": false,
+    "examples": [
+      ""
+    ],
+    "title": "Cheek",
+    "transcription": "[ʧiːk]",
+    "translate": "щека"
+  },
+  {
+    "id": 74,
+    "learned": false,
+    "examples": [
+      ""
+    ],
+    "title": "Niece",
+    "transcription": "[niːs]",
+    "translate": "племянница"
+  },
+  {
+    "id": 75,
+    "learned": false,
+    "examples": [
+      ""
+    ],
+    "title": "Garlic",
+    "transcription": "[ˈgɑːlɪk]",
+    "translate": "чеснок, чесночный"
   }
 ]

@@ -89,7 +89,7 @@ const Item = ({
           onClick={async (e) => {
             e.stopPropagation();
             try {
-              const res = await fetch(`http://localhost:5000/api/words/${item.id}`, {
+              const res = await fetch(`/api/words/${item.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ learned: true })
@@ -103,6 +103,29 @@ const Item = ({
           }}
         >
           Add to learned
+        </button>
+      }
+      {
+        item.learned && gameMode &&
+        <button
+          className='small-btn'
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const res = await fetch(`/api/words/${item.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ learned: false })
+              });
+                const updated = await res.json();
+                if (updateWord) updateWord(updated);
+                if (nextAfterMark) nextAfterMark();
+            } catch (err) {
+              console.error('Failed to mark unlearned', err);
+            }
+          }}
+        >
+          Add to unlearn
         </button>
       }
       {

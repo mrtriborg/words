@@ -26,7 +26,7 @@ function App() {
 
   useEffect(() => {
     // try loading from backend; fall back to local data
-    fetch('http://localhost:5000/api/words')
+    fetch('/api/words')
       .then(r => r.json())
       .then(d => {
         setWords(d);

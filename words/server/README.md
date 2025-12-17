@@ -22,4 +22,4 @@ Endpoints:
 - `GET /api/words` — returns all words
 - `PUT /api/words/:id` — update a word (send JSON body with fields to update, e.g. `{ "learned": true }`)
 
-The front-end expects the backend at `http://localhost:5000`.
+The front-end expects the backend at the URL specified in REACT_APP_API_BASE_URL (default `http://localhost:5000`).
