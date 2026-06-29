@@ -31,33 +31,59 @@ async function loadData() {
           transcription TEXT,
           translate TEXT,
           learned BOOLEAN,
-          examples JSON
+          examples JSONB
         )
       `);
+
+      console.log('🔍 Starting to fetch words from DB...');
       const res = await pool.query('SELECT * FROM words ORDER BY id');
-      words = res.rows.map(row => ({
-        ...row,
-        examples: Array.isArray(row.examples) ? row.examples : JSON.parse(row.examples || '[]')
-      }));
-      // Update JSON file with data from server (database)
-      try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(words, null, 2), 'utf8');
-        console.log('JSON file updated with data from database');
-      } catch (e) {
-        console.error('Failed to update JSON file', e);
+      console.log(`📦 Fetched \${res.rows.length} rows from DB`);
+
+      words = res.rows.map((row, index) => {
+        let examplesArray = [];
+        
+        // Безопасный парсинг
+        if (row.examples === null || row.examples === undefined) {
+          examplesArray = [];
+        } else if (Array.isArray(row.examples)) {
+          examplesArray = row.examples;
+        } else if (typeof row.examples === 'string') {
+          try {
+            examplesArray = JSON.parse(row.examples);
+            if (!Array.isArray(examplesArray)) examplesArray = [];
+          } catch (parseError) {
+            console.error(`🚨 Error parsing examples at row \${index}:`, parseError.message, 'Raw value:', row.examples);
+            examplesArray = [];
+          }
+        } else {
+          examplesArray = [];
+        }
+
+        return {
+          id: row.id,
+          title: row.title,
+          transcription: row.transcription,
+          translate: row.translate,
+          learned: row.learned,
+          examples: examplesArray
+        };
+      });
+
+      console.log(`✅ Successfully loaded \${words.length} words into memory`);
+      
+      // ТОЛЬКО если режим file, пишем в JSON. В режиме db ЭТО НЕ НУЖНО и опасно!
+      if (STORAGE_MODE === 'file') { 
+         fs.writeFileSync(DATA_FILE, JSON.stringify(words, null, 2), 'utf8');
       }
+
     } catch (e) {
-      console.error('Failed to load from DB', e);
+      console.error('💥 CRITICAL ERROR loading data from DB:', e.message);
+      console.error('Stack trace:', e.stack);
       words = [];
+      throw e; // Важно: если БД не работает, пусть сервер падает, а не отдает пустой массив
     }
   } else {
-    try {
-      const raw = fs.readFileSync(DATA_FILE, 'utf8');
-      words = JSON.parse(raw);
-    } catch (e) {
-      console.error('Failed to load data file', e);
-      words = [];
-    }
+    // ... логика для файла
   }
 }
 
