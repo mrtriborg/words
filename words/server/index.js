@@ -21,6 +21,36 @@ if (STORAGE_MODE === 'db') {
 }
 
 let words = [];
+
+function normalizeRow(row, index = 0) {
+  let examplesArray = [];
+
+  if (row.examples === null || row.examples === undefined) {
+    examplesArray = [];
+  } else if (Array.isArray(row.examples)) {
+    examplesArray = row.examples;
+  } else if (typeof row.examples === 'string') {
+    try {
+      examplesArray = JSON.parse(row.examples);
+      if (!Array.isArray(examplesArray)) examplesArray = [];
+    } catch (parseError) {
+      console.error(`🚨 Error parsing examples at row ${index}:`, parseError.message, 'Raw value:', row.examples);
+      examplesArray = [];
+    }
+  } else {
+    examplesArray = [];
+  }
+
+  return {
+    id: row.id,
+    title: row.title,
+    transcription: row.transcription,
+    translate: row.translate,
+    learned: row.learned,
+    examples: examplesArray
+  };
+}
+
 async function loadData() {
   if (STORAGE_MODE === 'db') {
     try {
@@ -37,39 +67,16 @@ async function loadData() {
 
       console.log('🔍 Starting to fetch words from DB...');
       const res = await pool.query('SELECT * FROM words ORDER BY id');
-      console.log(`📦 Fetched \${res.rows.length} rows from DB`);
-
-      words = res.rows.map((row, index) => {
-        let examplesArray = [];
-        
-        // Безопасный парсинг
-        if (row.examples === null || row.examples === undefined) {
-          examplesArray = [];
-        } else if (Array.isArray(row.examples)) {
-          examplesArray = row.examples;
-        } else if (typeof row.examples === 'string') {
-          try {
-            examplesArray = JSON.parse(row.examples);
-            if (!Array.isArray(examplesArray)) examplesArray = [];
-          } catch (parseError) {
-            console.error(`🚨 Error parsing examples at row \${index}:`, parseError.message, 'Raw value:', row.examples);
-            examplesArray = [];
-          }
-        } else {
-          examplesArray = [];
-        }
-
-        return {
-          id: row.id,
-          title: row.title,
-          transcription: row.transcription,
-          translate: row.translate,
-          learned: row.learned,
-          examples: examplesArray
-        };
+      console.log('🗄️ RAW DB RESPONSE:', {
+        rowCount: res.rowCount,
+        sampleRow: res.rows[0] || null
       });
+      console.log('📜 DB ROWS COUNT:', res.rows.length);
+      console.log(`📦 Fetched ${res.rows.length} rows from DB`);
 
-      console.log(`✅ Successfully loaded \${words.length} words into memory`);
+      words = res.rows.map((row, index) => normalizeRow(row, index));
+
+      console.log(`✅ Successfully loaded ${words.length} words into memory`);
       
       // ТОЛЬКО если режим file, пишем в JSON. В режиме db ЭТО НЕ НУЖНО и опасно!
       if (STORAGE_MODE === 'file') { 
@@ -111,7 +118,23 @@ async function saveData() {
 
 loadData();
 
-app.get('/api/words', (req, res) => {
+app.get('/api/words', async (req, res) => {
+  if (STORAGE_MODE === 'db') {
+    try {
+      const dbRes = await pool.query('SELECT * FROM words ORDER BY id');
+      console.log('🗄️ RAW DB RESPONSE for /api/words:', {
+        rowCount: dbRes.rowCount,
+        sampleRow: dbRes.rows[0] || null
+      });
+      console.log('📜 DB ROWS COUNT for /api/words:', dbRes.rows.length);
+      return res.json(dbRes.rows.map((row, index) => normalizeRow(row, index)));
+    } catch (fetchError) {
+      console.error('💥 Failed to fetch words from DB in /api/words:', fetchError);
+      return res.status(500).json({ error: 'DB read failed' });
+    }
+  }
+
+  console.log('📦 Returning in-memory words count:', words.length);
   res.json(words);
 });
 
