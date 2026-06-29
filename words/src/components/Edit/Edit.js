@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Edit.css';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
 
@@ -24,27 +24,38 @@ const Edit = () => {
 
   useEffect(() => { load(); }, []);
 
-  // if route has id, open editor for that id when words are loaded
+  // if route has id, open editor for that id; allow 'new' even when words array is empty
   useEffect(() => {
-    if (params.id && words.length > 0) {
-      if (params.id === 'new') {
-        setEditing({ ...emptyWord(), examples: [{ text: '', isNew: true, isEditing: true }] });
-        setIsCreating(true);
-        setDirty(true);
-        setSaved(false);
-      } else {
-        const id = Number(params.id);
-        const found = words.find(w => w.id === id);
-        if (found) {
-          const copy = { ...found, examples: (found.examples || []).map(e => ({ text: typeof e === 'string' ? e : e.en || '', isNew: false, isEditing: false })) };
-          setEditing(copy);
-          setIsCreating(false);
-          setDirty(false);
-          setSaved(false);
-        } else {
-          navigate('/edit');
-        }
-      }
+    if (!params.id) {
+      // reset editing when navigating back to /edit without id
+      setEditing(null);
+      setIsCreating(false);
+      setDirty(false);
+      setSaved(false);
+      return;
+    }
+
+    if (params.id === 'new') {
+      setEditing({ ...emptyWord(), examples: [{ en: '', ru: '', isNew: true, isEditing: true }] });
+      setIsCreating(true);
+      setDirty(true);
+      setSaved(false);
+      return;
+    }
+
+    // for numeric ids, wait until words are loaded
+    if (words.length === 0) return;
+
+    const id = Number(params.id);
+    const found = words.find(w => w.id === id);
+    if (found) {
+      const copy = { ...found, examples: (found.examples || []).map(e => ({ en: typeof e === 'string' ? e : e.en || '', ru: typeof e === 'string' ? '' : e.ru || '', isNew: false, isEditing: false })) };
+      setEditing(copy);
+      setIsCreating(false);
+      setDirty(false);
+      setSaved(false);
+    } else {
+      navigate('/edit');
     }
   }, [params.id, words]);
 
@@ -53,8 +64,8 @@ const Edit = () => {
   }
 
   const startEdit = (w) => {
-    // clone and prepare examples as { text, isNew:false }
-    const copy = { ...w, examples: (w.examples || []).map(e => ({ text: typeof e === 'string' ? e : e.en || '', isNew: false, isEditing: false })) };
+    // clone and prepare examples as { en, ru, isNew:false }
+    const copy = { ...w, examples: (w.examples || []).map(e => ({ en: typeof e === 'string' ? e : e.en || '', ru: typeof e === 'string' ? '' : e.ru || '', isNew: false, isEditing: false })) };
     setEditing(copy);
     setIsCreating(false);
     setDirty(false);
@@ -63,7 +74,7 @@ const Edit = () => {
 
   const save = async () => {
     if (!editing || !editing.title.trim() || !editing.translate.trim()) return;
-    const payload = { ...editing, examples: editing.examples.map(e => (e.text || '')) };
+    const payload = { ...editing, examples: editing.examples.map(e => ({ en: e.en, ru: e.ru })) };
     try {
       if (isCreating) {
         const res = await fetch(`${API_BASE}/api/words`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -104,13 +115,13 @@ const Edit = () => {
     // only allow adding if no example has isNew or isEditing true
     const hasBlocked = editing.examples.some(e => e.isNew || e.isEditing);
     if (hasBlocked) return;
-    setEditing(prev => ({ ...prev, examples: [ ...prev.examples, { text: '', isNew: true, isEditing: true } ] }));
+    setEditing(prev => ({ ...prev, examples: [ ...prev.examples, { en: '', ru: '', isNew: true, isEditing: true } ] }));
     setDirty(true);
   }
 
   const saveExample = (idx) => {
     setEditing(prev => {
-      const ex = prev.examples.map((e,i) => i===idx?{ text: e.text, isNew: false, isEditing: false }:e);
+      const ex = prev.examples.map((e,i) => i===idx?{ en: e.en, ru: e.ru, isNew: false, isEditing: false }:e);
       return { ...prev, examples: ex };
     })
     setDirty(true);
@@ -129,7 +140,7 @@ const Edit = () => {
       <div className='edit-top'>
         <h2>Edit words</h2>
         <div>
-          <Link to="/" className='small-btn'>Back to game</Link>
+          <button className='small-btn' onClick={() => navigate('/')}>Back to game</button>
         </div>
       </div>
 
@@ -143,9 +154,9 @@ const Edit = () => {
           <div className='word-list'>
             {words.map(w => (
               <div key={w.id} className='word-row'>
-                <div>{w.title} — {w.translate}</div>
-                <div>
-                  <Link to={`/edit/${w.id}`} className='small-btn'>Edit</Link>
+                <div className='word-row-edit-content'>{w.title} — {w.translate}</div>
+                <div className='word-row-edit-buttons'>
+                  <button className='small-btn' onClick={() => navigate(`/edit/${w.id}`)}>Edit</button>
                   <button className='small-btn' onClick={() => remove(w.id)}>Delete</button>
                 </div>
               </div>
@@ -158,15 +169,15 @@ const Edit = () => {
         <div className='editor'>
           <div>
             <label>Word / expression</label>
-            <input value={editing.title} onChange={e => { setEditing(prev => ({ ...prev, title: e.target.value })); setDirty(true); setSaved(false); }} />
+            <input style={{width: '200px'}} value={editing.title} onChange={e => { setEditing(prev => ({ ...prev, title: e.target.value })); setDirty(true); setSaved(false); }} />
           </div>
           <div>
             <label>Transcription</label>
-            <input value={editing.transcription} onChange={e => { setEditing(prev => ({ ...prev, transcription: e.target.value })); setDirty(true); setSaved(false); }} />
+            <input style={{width: '200px'}} value={editing.transcription} onChange={e => { setEditing(prev => ({ ...prev, transcription: e.target.value })); setDirty(true); setSaved(false); }} />
           </div>
           <div>
             <label>Translate</label>
-            <input value={editing.translate} onChange={e => { setEditing(prev => ({ ...prev, translate: e.target.value })); setDirty(true); setSaved(false); }} />
+            <input className='edit-translate-input' value={editing.translate} onChange={e => { setEditing(prev => ({ ...prev, translate: e.target.value })); setDirty(true); setSaved(false); }} />
           </div>
 
           <div className='examples-list'>
@@ -175,13 +186,19 @@ const Edit = () => {
               <div className='example-row' key={idx}>
                 {ex.isNew || ex.isEditing ? (
                   <>
-                    <input value={ex.text} onChange={e => { setEditing(prev => ({ ...prev, examples: prev.examples.map((ee,i)=> i===idx?{...ee, text: e.target.value}:ee) })); setDirty(true); setSaved(false); }} />
+                    <div style={{display:'flex', flexDirection:'column', gap:'4px', flex:1}}>
+                      <input placeholder="EN" value={ex.en} onChange={e => { setEditing(prev => ({ ...prev, examples: prev.examples.map((ee,i)=> i===idx?{...ee, en: e.target.value}:ee) })); setDirty(true); setSaved(false); }} />
+                      <input placeholder="RU" value={ex.ru} onChange={e => { setEditing(prev => ({ ...prev, examples: prev.examples.map((ee,i)=> i===idx?{...ee, ru: e.target.value}:ee) })); setDirty(true); setSaved(false); }} />
+                    </div>
                     <button className='small-btn' onClick={() => saveExample(idx)} disabled={!(ex.isNew || ex.isEditing)}>Save</button>
                     <button className='small-btn' onClick={() => removeExample(idx)}>Remove</button>
                   </>
                 ) : (
                   <>
-                    <div style={{flex:1, padding:'6px 8px', background:'#f7f7f7'}}>{ex.text}</div>
+                    <div style={{flex:1, padding:'6px 8px', background:'#f7f7f7'}}>
+                      <div>{ex.en}</div>
+                      <div style={{fontSize:'smaller', color:'#666'}}>{ex.ru}</div>
+                    </div>
                     <button className='small-btn' onClick={() => setEditing(prev => ({ ...prev, examples: prev.examples.map((ee,i)=> i===idx?{...ee, isEditing:true}:ee) }))}>Edit</button>
                     <button className='small-btn' onClick={() => removeExample(idx)}>Remove</button>
                   </>

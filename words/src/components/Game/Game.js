@@ -12,6 +12,13 @@ const Game = ({data, updateWord, onSessionEnd}) => {
     return array;
   };
 
+  const updateWordWrapper = (updated) => {
+    updateWord(updated);
+    if (currentItem && currentItem.id === updated.id) {
+      setCurrentItem(updated);
+    }
+  };
+
   useEffect(() => {
     if (!data || data.length === 0) {
       setGameData([]);
@@ -19,13 +26,16 @@ const Game = ({data, updateWord, onSessionEnd}) => {
       setCurrentItem(null);
       return;
     }
-    const shuffledArray = shuffle([...data]);
-    setGameData(shuffledArray);
-    setGameDataRepeat(structuredClone(shuffledArray));
-    setCurrentItem(shuffledArray[0]);
-    setUnknownWords([]);
-    setAddedToUnknown(false);
-    setIsRepeatMode(false);
+    if (gameData.length === 0) {
+      const shuffledArray = shuffle([...data]);
+      setGameData(shuffledArray);
+      setGameDataRepeat(structuredClone(shuffledArray));
+      setCurrentItem(shuffledArray[0]);
+      setUnknownWords([]);
+      setAddedToUnknown(false);
+      setIsRepeatMode(false);
+    }
+    // After game started, do not reshuffle or change currentItem on data updates
   }, [data])
 
   const [gameData, setGameData] = useState([]);
@@ -95,7 +105,7 @@ const Game = ({data, updateWord, onSessionEnd}) => {
           <Item
             item={currentItem}
             gameMode={true}
-            updateWord={updateWord}
+            updateWord={updateWordWrapper}
             nextAfterMark={() => setNextWord()}
           />
           <div className='game-buttons'>

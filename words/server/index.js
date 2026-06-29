@@ -39,6 +39,13 @@ async function loadData() {
         ...row,
         examples: Array.isArray(row.examples) ? row.examples : JSON.parse(row.examples || '[]')
       }));
+      // Update JSON file with data from server (database)
+      try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(words, null, 2), 'utf8');
+        console.log('JSON file updated with data from database');
+      } catch (e) {
+        console.error('Failed to update JSON file', e);
+      }
     } catch (e) {
       console.error('Failed to load from DB', e);
       words = [];

@@ -30,3 +30,38 @@
 }
 .example-row input { flex:1 }
 .controls { display:flex; gap:8px; margin-top:8px }
+
+.word-row-edit-buttons {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.edit-translate-input {
+  width: 98%;
+}
+
+.editor label {
+  display: inline-block;
+  width: 150px;
+}
+
+.example-row input {
+  width: 98%;
+}
+
+
+@media (max-width: 610px) {
+  .word-row-edit-content {
+    display: flex;
+    width: 100%;
+  }
+  .word-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .example-row {
+    flex-direction: column;
+  }
+}

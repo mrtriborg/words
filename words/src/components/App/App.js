@@ -27,12 +27,37 @@ function App() {
   };
 
   useEffect(() => {
-    // try loading from backend; fall back to local data
+    if (selectedWords.length < 10) {
+      setSampleSize(selectedWords.length);
+    }
+  }, [selectedWords]);
+
+  useEffect(() => {
+    // try loading from backend; fall back to local data if response is invalid/empty
     fetch(`${API_BASE}/api/words`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error('Network response not ok');
+        return r.json();
+      })
       .then(d => {
-        setWords(d);
-        setSelectedWords(d);
+        // handle several possible shapes:
+        //  - array ([]) or non-empty array
+        //  - { data: [...] }
+        // if server returns an empty array, fall back to localData
+        let payload = [];
+        if (Array.isArray(d) && d.length > 0) {
+          payload = d;
+        } else if (d && Array.isArray(d.data) && d.data.length > 0) {
+          payload = d.data;
+        }
+
+        if (payload.length > 0) {
+          setWords(payload);
+          setSelectedWords(payload);
+        } else {
+          setWords(localData);
+          setSelectedWords(localData);
+        }
       })
       .catch(() => {
         setWords(localData);
@@ -45,6 +70,16 @@ function App() {
     setSelectedWords(prev => prev.map(w => w.id === updated.id ? updated : w));
     setSessionWords(prev => prev.map(w => w.id === updated.id ? updated : w));
   }
+
+  const handleExport = () => {
+    const dataStr = JSON.stringify(words, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportFileDefaultName = 'words.json';
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
 
   const shuffle = (array) => {
     const a = [...array];
@@ -90,6 +125,13 @@ function App() {
           GAME {gameMode ? "OFF" : "ON"}
         </a>
         <Link to="/edit" style={{position:'absolute', right:16, top:16}} className='small-btn'>Edit</Link>
+        <button
+          className='small-btn'
+          onClick={handleExport}
+          style={{position:'absolute', left:16, top:16, width: '65px'}}
+        >
+          Export Data
+        </button>
         <input
           type='number'
           min={1}

@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 0 10px;
+  padding: 0 30px;
 }
 
 .game-buttons {
@@ -15,6 +15,7 @@
 .game-buttons a {
   margin: 0 10px 10px;
   font-size: 15px;
+  text-align: center;
 }
 
 .repeat {

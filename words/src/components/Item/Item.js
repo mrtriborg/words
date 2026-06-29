@@ -98,7 +98,7 @@ const Item = ({
               });
                 const updated = await res.json();
                 if (updateWord) updateWord(updated);
-                if (nextAfterMark) nextAfterMark();
+                // if (nextAfterMark) nextAfterMark();
             } catch (err) {
               console.error('Failed to mark learned', err);
             }
@@ -121,7 +121,7 @@ const Item = ({
               });
                 const updated = await res.json();
                 if (updateWord) updateWord(updated);
-                if (nextAfterMark) nextAfterMark();
+                // if (nextAfterMark) nextAfterMark();
             } catch (err) {
               console.error('Failed to mark unlearned', err);
             }
