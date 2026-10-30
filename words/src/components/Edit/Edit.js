@@ -62,7 +62,7 @@ const Edit = () => {
     if (words.length === 0) return;
 
     const id = Number(params.id);
-    const found = words.find(w => w.id === id);
+    const found = words.find(w => Number(w.id) === id);
     if (found) {
       const copy = { ...found, examples: (found.examples || []).map(e => ({ en: typeof e === 'string' ? e : e.en || '', ru: typeof e === 'string' ? '' : e.ru || '', isNew: false, isEditing: false })) };
       setEditing(copy);
@@ -76,6 +76,22 @@ const Edit = () => {
 
   const startCreate = () => {
     navigate('/edit/new');
+  }
+
+  const startEdit = (word) => {
+    const copy = {
+      ...word,
+      examples: (word.examples || []).map(example => ({
+        en: typeof example === 'string' ? example : example.en || '',
+        ru: typeof example === 'string' ? '' : example.ru || '',
+        isNew: false,
+        isEditing: false
+      }))
+    };
+    setEditing(copy);
+    setIsCreating(false);
+    setDirty(false);
+    setSaved(false);
   }
 
   const save = async () => {
@@ -171,7 +187,7 @@ const Edit = () => {
               <div key={w.id} className='word-row'>
                 <div className='word-row-edit-content'>{w.title} — {w.translate}</div>
                 <div className='word-row-edit-buttons'>
-                  <button className='small-btn' onClick={() => navigate(`/edit/${w.id}`)}>Edit</button>
+                  <button className='small-btn' onClick={() => startEdit(w)}>Edit</button>
                   <button className='small-btn' onClick={() => remove(w.id)}>Delete</button>
                 </div>
               </div>
