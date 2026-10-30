@@ -8,7 +8,7 @@ const { Pool } = require('pg');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 const DATA_FILE = path.join(__dirname, 'words.json');
 const STORAGE_MODE = process.env.STORAGE_MODE || 'file'; // 'file' or 'db'
@@ -90,33 +90,40 @@ async function loadData() {
       throw e; // Важно: если БД не работает, пусть сервер падает, а не отдает пустой массив
     }
   } else {
-    // ... логика для файла
+    const fileContents = fs.readFileSync(DATA_FILE, 'utf8');
+    const fileWords = JSON.parse(fileContents);
+    if (!Array.isArray(fileWords)) {
+      throw new TypeError(`Expected an array of words in ${DATA_FILE}`);
+    }
+    words = fileWords.map((row, index) => normalizeRow(row, index));
+    console.log(`✅ Successfully loaded ${words.length} words from file`);
   }
 }
 
-async function saveData() {
+async function saveData(nextWords) {
   if (STORAGE_MODE === 'db') {
+    const client = await pool.connect();
     try {
-      await pool.query('DELETE FROM words');
-      for (const word of words) {
-        await pool.query(
+      await client.query('BEGIN');
+      await client.query('DELETE FROM words');
+      for (const word of nextWords) {
+        await client.query(
           'INSERT INTO words (id, title, transcription, translate, learned, examples) VALUES ($1, $2, $3, $4, $5, $6)',
           [word.id, word.title, word.transcription, word.translate, word.learned, JSON.stringify(word.examples)]
         );
       }
+      await client.query('COMMIT');
     } catch (e) {
-      console.error('Failed to save to DB', e);
+      await client.query('ROLLBACK');
+      throw e;
+    }
+    finally {
+      client.release();
     }
   } else {
-    try {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(words, null, 2), 'utf8');
-    } catch (e) {
-      console.error('Failed to save data file', e);
-    }
+    fs.writeFileSync(DATA_FILE, JSON.stringify(nextWords, null, 2), 'utf8');
   }
 }
-
-loadData();
 
 app.get('/api/words', async (req, res) => {
   if (STORAGE_MODE === 'db') {
@@ -143,9 +150,73 @@ app.post('/api/words', async (req, res) => {
   const body = req.body || {};
   const maxId = words.reduce((m, w) => Math.max(m, w.id || 0), 0);
   const newWord = Object.assign({ id: maxId + 1, learned: false, examples: [] }, body);
-  words.push(newWord);
-  await saveData();
+  const nextWords = [...words, newWord];
+  try {
+    await saveData(nextWords);
+    words = nextWords;
+  } catch (error) {
+    console.error('Failed to create word:', error);
+    return res.status(500).json({ error: 'Failed to save word' });
+  }
   res.status(201).json(newWord);
+});
+
+app.post('/api/words/import', async (req, res) => {
+  const importedWords = req.body && req.body.words;
+  if (!Array.isArray(importedWords)) {
+    return res.status(400).json({ error: 'Expected a JSON array in the words field' });
+  }
+
+  const ids = new Set();
+  const normalizedWords = [];
+  for (const [index, row] of importedWords.entries()) {
+    if (!row || typeof row !== 'object' || Array.isArray(row)) {
+      return res.status(400).json({ error: `Word at index ${index} must be an object` });
+    }
+    if (!Number.isInteger(row.id) || row.id < 1 || ids.has(row.id)) {
+      return res.status(400).json({ error: `Word at index ${index} has a missing, invalid, or duplicate id` });
+    }
+    if (typeof row.title !== 'string' || typeof row.translate !== 'string') {
+      return res.status(400).json({ error: `Word at index ${index} must have title and translate strings` });
+    }
+    if (row.transcription !== undefined && typeof row.transcription !== 'string') {
+      return res.status(400).json({ error: `Word at index ${index} has an invalid transcription` });
+    }
+    if (row.learned !== undefined && typeof row.learned !== 'boolean') {
+      return res.status(400).json({ error: `Word at index ${index} has an invalid learned value` });
+    }
+    if (row.examples !== undefined && !Array.isArray(row.examples)) {
+      return res.status(400).json({ error: `Word at index ${index} has invalid examples` });
+    }
+    ids.add(row.id);
+    normalizedWords.push(normalizeRow({
+      ...row,
+      transcription: row.transcription || '',
+      learned: row.learned === undefined ? false : row.learned,
+      examples: row.examples || []
+    }, index));
+  }
+
+  const nextWords = [...words];
+  const existingIndexes = new Map(nextWords.map((word, index) => [word.id, index]));
+  for (const word of normalizedWords) {
+    const existingIndex = existingIndexes.get(word.id);
+    if (existingIndex === undefined) {
+      existingIndexes.set(word.id, nextWords.length);
+      nextWords.push(word);
+    } else {
+      nextWords[existingIndex] = word;
+    }
+  }
+
+  try {
+    await saveData(nextWords);
+    words = nextWords;
+    return res.json({ imported: normalizedWords.length, words });
+  } catch (error) {
+    console.error('Failed to import words:', error);
+    return res.status(500).json({ error: 'Failed to save imported words' });
+  }
 });
 
 app.put('/api/words/:id', async (req, res) => {
@@ -153,8 +224,15 @@ app.put('/api/words/:id', async (req, res) => {
   const idx = words.findIndex(w => w.id === id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
   const updated = Object.assign({}, words[idx], req.body);
-  words[idx] = updated;
-  await saveData();
+  const nextWords = [...words];
+  nextWords[idx] = updated;
+  try {
+    await saveData(nextWords);
+    words = nextWords;
+  } catch (error) {
+    console.error('Failed to update word:', error);
+    return res.status(500).json({ error: 'Failed to save word' });
+  }
   res.json(updated);
 });
 
@@ -163,10 +241,22 @@ app.delete('/api/words/:id', async (req, res) => {
   const id = Number(req.params.id);
   const idx = words.findIndex(w => w.id === id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  const deleted = words.splice(idx, 1)[0];
-  await saveData();
+  const deleted = words[idx];
+  const nextWords = words.filter((_, index) => index !== idx);
+  try {
+    await saveData(nextWords);
+    words = nextWords;
+  } catch (error) {
+    console.error('Failed to delete word:', error);
+    return res.status(500).json({ error: 'Failed to delete word' });
+  }
   res.json({ success: true, deleted });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+loadData()
+  .then(() => app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`)))
+  .catch(error => {
+    console.error('Failed to initialize backend:', error);
+    process.exitCode = 1;
+  });

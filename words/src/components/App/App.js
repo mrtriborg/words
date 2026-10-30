@@ -1,7 +1,7 @@
 import Game from '../Game/Game';
 import ItemList from '../ItemList/ItemList';
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import {data as localData} from '../../data';
@@ -16,6 +16,9 @@ function App() {
   const [knownWords, setKnownWords] = useState(true);
   const [sampleSize, setSampleSize] = useState(10);
   const [sessionWords, setSessionWords] = useState([]);
+  const [importMessage, setImportMessage] = useState('');
+  const [importError, setImportError] = useState('');
+  const importInput = useRef(null);
 
   const setLearnedWords = () => {
     const allData = [...words];
@@ -81,6 +84,42 @@ function App() {
     linkElement.click();
   };
 
+  const handleImport = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setImportMessage('');
+    setImportError('');
+
+    try {
+      const importedWords = JSON.parse(await file.text());
+      if (!Array.isArray(importedWords)) {
+        throw new Error('В JSON должен быть массив слов.');
+      }
+
+      const response = await fetch(`${API_BASE}/api/words/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ words: importedWords })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || `Ошибка импорта (${response.status}).`);
+      }
+
+      setWords(result.words);
+      setSelectedWords(result.words);
+      setKnownWords(true);
+      setSampleSize(Math.min(10, result.words.length));
+      setSessionWords([]);
+      setGameMode(false);
+      setImportMessage(`Импортировано слов: ${result.imported}. Всего в списке: ${result.words.length}.`);
+    } catch (error) {
+      setImportError(error.message || 'Не удалось импортировать JSON.');
+    }
+  };
+
   const shuffle = (array) => {
     const a = [...array];
     for (let i = a.length - 1; i > 0; i--) {
@@ -125,13 +164,21 @@ function App() {
           GAME {gameMode ? "OFF" : "ON"}
         </a>
         <Link to="/edit" style={{position:'absolute', right:16, top:16}} className='small-btn'>Edit</Link>
-        <button
-          className='small-btn'
-          onClick={handleExport}
-          style={{position:'absolute', left:16, top:16, width: '65px'}}
-        >
-          Export Data
-        </button>
+        <div className='data-actions'>
+          <button className='small-btn' onClick={handleExport}>
+            Export<br />Data
+          </button>
+          <button className='small-btn' onClick={() => importInput.current?.click()}>
+            Import<br />JSON
+          </button>
+        </div>
+        <input
+          ref={importInput}
+          type='file'
+          accept='.json,application/json'
+          onChange={handleImport}
+          style={{display: 'none'}}
+        />
         <input
           type='number'
           min={1}
@@ -170,6 +217,11 @@ function App() {
           </btn>
         </div>
       </header>
+      {(importMessage || importError) && (
+        <p role={importError ? 'alert' : 'status'} style={{textAlign: 'center', color: importError ? 'darkred' : 'darkgreen'}}>
+          {importError || importMessage}
+        </p>
+      )}
       {
         gameMode ? (
           <Game 

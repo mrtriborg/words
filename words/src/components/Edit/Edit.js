@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './Edit.css';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -14,15 +14,30 @@ const Edit = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const load = () => {
-    fetch(`${API_BASE}/api/words`)
-      .then(r => r.json())
-      .then(d => setWords(d.sort((a, b) => b.id - a.id)))
-      .catch(err => console.error(err));
-  }
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`${API_BASE}/api/words`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `Не удалось загрузить список (${response.status}).`);
+      }
+      if (!Array.isArray(data)) {
+        throw new Error('Сервер вернул некорректный список слов.');
+      }
+      setWords(data.sort((a, b) => b.id - a.id));
+    } catch (err) {
+      setError(`${err.message} Проверьте адрес API в REACT_APP_API_BASE_URL.`);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   // if route has id, open editor for that id; allow 'new' even when words array is empty
   useEffect(() => {
@@ -57,28 +72,21 @@ const Edit = () => {
     } else {
       navigate('/edit');
     }
-  }, [params.id, words]);
+  }, [params.id, words, navigate]);
 
   const startCreate = () => {
     navigate('/edit/new');
   }
 
-  const startEdit = (w) => {
-    // clone and prepare examples as { en, ru, isNew:false }
-    const copy = { ...w, examples: (w.examples || []).map(e => ({ en: typeof e === 'string' ? e : e.en || '', ru: typeof e === 'string' ? '' : e.ru || '', isNew: false, isEditing: false })) };
-    setEditing(copy);
-    setIsCreating(false);
-    setDirty(false);
-    setSaved(false);
-  }
-
   const save = async () => {
     if (!editing || !editing.title.trim() || !editing.translate.trim()) return;
     const payload = { ...editing, examples: editing.examples.map(e => ({ en: e.en, ru: e.ru })) };
+    setError('');
     try {
       if (isCreating) {
         const res = await fetch(`${API_BASE}/api/words`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const created = await res.json();
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || `Не удалось создать слово (${res.status}).`);
         // refresh list from server to keep consistent
         await load();
         setSaved(true);
@@ -88,7 +96,8 @@ const Edit = () => {
         navigate('/edit');
       } else {
         const res = await fetch(`${API_BASE}/api/words/${editing.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const updated = await res.json();
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || `Не удалось сохранить слово (${res.status}).`);
         await load();
         setSaved(true);
         setDirty(false);
@@ -97,7 +106,7 @@ const Edit = () => {
         navigate('/edit');
       }
     } catch (err) {
-      console.error('Save failed', err);
+      setError(`${err.message} Проверьте адрес API в REACT_APP_API_BASE_URL.`);
     }
   }
 
@@ -106,8 +115,11 @@ const Edit = () => {
     try {
       const res = await fetch(`${API_BASE}/api/words/${id}`, { method: 'DELETE' });
       const result = await res.json();
+      if (!res.ok) throw new Error(result.error || `Не удалось удалить слово (${res.status}).`);
       if (result.success) setWords(prev => prev.filter(w => w.id !== id));
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      setError(`${err.message} Проверьте адрес API в REACT_APP_API_BASE_URL.`);
+    }
   }
 
   const addExampleField = () => {
@@ -144,6 +156,9 @@ const Edit = () => {
         </div>
       </div>
 
+      {error && <p role='alert' style={{color: 'darkred'}}>{error}</p>}
+      {loading && <p role='status'>Загрузка слов...</p>}
+
       {!editing && (
         <>
           <div className='controls'>
@@ -151,7 +166,7 @@ const Edit = () => {
             <button className='small-btn' onClick={load}>Reload</button>
           </div>
 
-          <div className='word-list'>
+          {!loading && !error && <div className='word-list'>
             {words.map(w => (
               <div key={w.id} className='word-row'>
                 <div className='word-row-edit-content'>{w.title} — {w.translate}</div>
@@ -161,7 +176,7 @@ const Edit = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </div>}
         </>
       )}
 
