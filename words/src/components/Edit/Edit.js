@@ -141,9 +141,9 @@ const Edit = () => {
       const res = await fetch(`${API_BASE}/api/words/${id}`, { method: 'DELETE' });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || `Не удалось удалить слово (${res.status}).`);
-      if (result.success) setWords(prev => prev.filter(w => w.id !== id));
+      if (result.success) setWords(prev => prev.filter(w => Number(w.id) !== Number(id)));
     } catch (err) {
-      setError(`${err.message} Проверьте адрес API в REACT_APP_API_BASE_URL.`);
+      setError(err.message);
     }
   }
 

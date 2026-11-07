@@ -239,18 +239,31 @@ app.put('/api/words/:id', async (req, res) => {
 // Delete a word
 app.delete('/api/words/:id', async (req, res) => {
   const id = Number(req.params.id);
-  const idx = words.findIndex(w => w.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  const deleted = words[idx];
-  const nextWords = words.filter((_, index) => index !== idx);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return res.status(400).json({ error: 'Invalid word id' });
+  }
+
   try {
-    await saveData(nextWords);
-    words = nextWords;
+    let deleted;
+    if (STORAGE_MODE === 'db') {
+      const result = await pool.query('DELETE FROM words WHERE id = $1 RETURNING *', [id]);
+      if (result.rowCount === 0) return res.status(404).json({ error: 'Not found' });
+      deleted = normalizeRow(result.rows[0]);
+      words = words.filter(word => Number(word.id) !== id);
+    } else {
+      const idx = words.findIndex(word => Number(word.id) === id);
+      if (idx === -1) return res.status(404).json({ error: 'Not found' });
+      deleted = words[idx];
+      const nextWords = words.filter((_, index) => index !== idx);
+      await saveData(nextWords);
+      words = nextWords;
+    }
+
+    return res.json({ success: true, deleted });
   } catch (error) {
     console.error('Failed to delete word:', error);
     return res.status(500).json({ error: 'Failed to delete word' });
   }
-  res.json({ success: true, deleted });
 });
 
 const PORT = process.env.PORT || 5000;
