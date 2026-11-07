@@ -9,16 +9,26 @@
 .word-list {
   margin-top: 16px;
 }
+.word-search {
+  box-sizing: border-box;
+  margin-top: 12px;
+  max-width: 100%;
+  padding: 8px;
+  width: 320px;
+}
 .word-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 .editor {
   margin-top: 16px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: rgba(25, 22, 41, .88);
   padding: 12px;
+  box-shadow: 0 0 22px rgba(105, 71, 133, .08);
 }
 .examples-list {
   margin-top: 8px;

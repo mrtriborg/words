@@ -9,26 +9,28 @@
 a {
   font-weight: 600;
   padding: 5px 10px;
-  color: #f4f4f4;
+  color: var(--text-color);
   text-transform: uppercase;
 }
 
 .btn {
   margin: 5px;
   border-radius: 100px;
-  color: black;
-  border: 1px solid black;
+  color: var(--text-color);
+  background: linear-gradient(135deg, #28203d, #1d2634);
+  border: 1px solid #65496f;
   cursor: pointer;
 }
 
 .small-btn {
   margin: 5px;
   border-radius: 100px;
-  color: black;
+  color: var(--text-color);
+  background: #211d35;
   font-weight: 600;
-  border: 1px solid black;
-  cursor: pointer;
+  border: 1px solid #44395f;
   padding: 0 5px;
+  cursor: pointer;
 }
 
 .btn:link,
@@ -75,10 +77,9 @@ a {
   pointer-events: none;
   margin: 5px;
   border-radius: 100px;
-  color: black;
-  border: 1px solid darkgray;
-  background-color: darkgray;
-  color: white;
+  color: #aaa2b8;
+  border-color: #454052;
+  background-color: #302d3a;
   cursor: pointer;
 }
 
@@ -86,11 +87,10 @@ a {
   pointer-events: none;
   margin: 5px;
   border-radius: 100px;
-  color: black;
+  color: #aaa2b8;
   font-weight: 600;
-  border: 1px solid darkgray;
-  background-color: darkgray;
-  color: white;
+  border-color: #454052;
+  background-color: #302d3a;
   cursor: pointer;
   padding: 0 5px;
 }

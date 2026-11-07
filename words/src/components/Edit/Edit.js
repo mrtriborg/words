@@ -10,6 +10,7 @@ const Edit = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [words, setWords] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [editing, setEditing] = useState(null); // word object or null
   const [isCreating, setIsCreating] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -94,6 +95,14 @@ const Edit = () => {
     setSaved(false);
   }
 
+  const cancelEditing = () => {
+    setEditing(null);
+    setIsCreating(false);
+    setDirty(false);
+    setSaved(false);
+    navigate('/edit');
+  }
+
   const save = async () => {
     if (!editing || !editing.title.trim() || !editing.translate.trim()) return;
     const payload = { ...editing, examples: editing.examples.map(e => ({ en: e.en, ru: e.ru })) };
@@ -137,6 +146,11 @@ const Edit = () => {
       setError(`${err.message} Проверьте адрес API в REACT_APP_API_BASE_URL.`);
     }
   }
+
+  const search = searchTerm.trim().toLocaleLowerCase();
+  const filteredWords = words.filter(word =>
+    `${word.title || ''} ${word.translate || ''}`.toLocaleLowerCase().includes(search)
+  );
 
   const addExampleField = () => {
     if (!editing) return;
@@ -182,8 +196,17 @@ const Edit = () => {
             <button className='small-btn' onClick={load}>Reload</button>
           </div>
 
+          <input
+            className='word-search'
+            type='search'
+            aria-label='Search words'
+            placeholder='Search by word or translation'
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+
           {!loading && !error && <div className='word-list'>
-            {words.map(w => (
+            {filteredWords.length > 0 ? filteredWords.map(w => (
               <div key={w.id} className='word-row'>
                 <div className='word-row-edit-content'>{w.title} — {w.translate}</div>
                 <div className='word-row-edit-buttons'>
@@ -191,7 +214,7 @@ const Edit = () => {
                   <button className='small-btn' onClick={() => remove(w.id)}>Delete</button>
                 </div>
               </div>
-            ))}
+            )) : <p role='status'>No words found.</p>}
           </div>}
         </>
       )}
@@ -226,7 +249,7 @@ const Edit = () => {
                   </>
                 ) : (
                   <>
-                    <div style={{flex:1, padding:'6px 8px', background:'#f7f7f7'}}>
+                    <div style={{flex:1, padding:'6px 8px', background:'#211d35'}}>
                       <div>{ex.en}</div>
                       <div style={{fontSize:'smaller', color:'#666'}}>{ex.ru}</div>
                     </div>
@@ -243,7 +266,7 @@ const Edit = () => {
 
           <div className='controls'>
             <button className='btn' onClick={save} disabled={!dirty || !editing?.title?.trim() || !editing?.translate?.trim()}>{dirty ? 'Save*' : (saved ? 'Saved' : 'Save')}</button>
-            <button className='small-btn' onClick={() => navigate('/edit')}>Cancel</button>
+            <button className='small-btn' onClick={cancelEditing}>Cancel</button>
           </div>
         </div>
       )}

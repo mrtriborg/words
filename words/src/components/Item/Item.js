@@ -73,13 +73,9 @@ const Item = ({
           </span>
         </div>
       }
-      <span 
-        style={{
-          backgroundColor: !gameMode ? gameData.find(element => element.id === item.id) ? 'rgb(21, 255, 0)' : '' : '',
-          cursor: 'pointer',
-          fontWeight: "bold"
-        }}
-        className={gameMode ? '' : 'item'}
+      <span
+        className={gameMode ? '' : `item${isWordInGame(item.id) ? ' item-selected' : ''}`}
+        style={{cursor: 'pointer', fontWeight: 'bold'}}
         onClick={addToGame}
       >
         {item.title + ' '}
@@ -140,12 +136,13 @@ const Item = ({
           >
             {item.transcription + ' - '}
           </span>
-          <span 
-            style={{cursor: 'pointer'}}
+          <button
+            type='button'
+            className='translate-toggle'
             onClick={() => setShowTranslate(!showTranslate)}
           >
             {showTranslate ? item.translate : 'TRANSLATE'}
-          </span>
+          </button>
           {
             showTranslate && item.examples.length > 0 && 
               <div className='example-list'>

@@ -1,10 +1,85 @@
+:root {
+  color-scheme: dark;
+  --page-bg: #100e1b;
+  --panel-bg: #191629;
+  --panel-raised: #211d35;
+  --border-color: #3b3458;
+  --text-color: #eeeaf7;
+  --muted-color: #b6accb;
+  --neon-pink: #e879c5;
+  --neon-cyan: #75dce5;
+  background: var(--page-bg);
+  color: var(--text-color);
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% -25%, rgba(108, 57, 134, 0.22), transparent 58%),
+    linear-gradient(180deg, #12101f 0%, var(--page-bg) 65%);
+  background-attachment: fixed;
+  color: var(--text-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.btn,
+.small-btn {
+  transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+button:hover:not(:disabled),
+.btn:hover,
+.small-btn:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(117, 220, 229, 0.16);
+}
+
+button:active:not(:disabled),
+.btn:active,
+.small-btn:active {
+  box-shadow: 0 0 14px rgba(232, 121, 197, 0.22);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+input {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--panel-bg);
+  color: var(--text-color);
+  padding: 6px 8px;
+}
+
+input:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 1px;
+  box-shadow: 0 0 10px rgba(117, 220, 229, 0.18);
+}
+
+::selection {
+  background: rgba(232, 121, 197, .35);
+  color: #fff;
 }
 
 code {
